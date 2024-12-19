@@ -28,7 +28,10 @@ class MapsData:
             'north': {'coords': (242, 125), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-1'},
             'south': {'coords': (167, 42), 'direction': 'Юг', 'label': 'Правый угол взлетки ЗП-2'},
         },
-        'shivas': {'north': {'coords': (30, 150), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-2'}},
+        'shivas': {
+            'north': {'coords': (30, 150), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-2'},
+            'south': {'coords': (30, 42), 'direction': 'Юг', 'label': 'Справа дерево у взлетки ЗП-1'},
+        },
         'trijent': {
             'north': {'coords': (40, 215), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-1'},
             'south': {'coords': (27, 35), 'direction': 'Юг', 'label': 'Правый угол взлетки ЗП-2'},
