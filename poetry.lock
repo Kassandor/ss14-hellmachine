@@ -12,6 +12,16 @@ files = [
 ]
 
 [[package]]
+name = "pyperclip"
+version = "1.9.0"
+description = "A cross-platform clipboard module for Python. (Only handles plain text for now.)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyperclip-1.9.0.tar.gz", hash = "sha256:b7de0142ddc81bfc5c7507eea19da920b92252b548b96186caf94a5e2527d310"},
+]
+
+[[package]]
 name = "pyqt5"
 version = "5.15.11"
 description = "Python bindings for the Qt cross platform application toolkit"
@@ -171,4 +181,4 @@ test = ["pytest (>=6,!=7.0.0,!=7.0.1)", "pytest-cov (>=3.0.0)", "pytest-qt"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "b3e9694ceb06e9bf8daad82920778014ef98dee9312525361abae174d57d3f65"
+content-hash = "42d03bebae4b6b1179ba0cf5a179bf6e304ea59352a590620968cddcfae6cef8"

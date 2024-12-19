@@ -17,6 +17,7 @@ pyqtwebengine-qt5 = "^5.15.16"
 python-dotenv = "^1.0.1"
 qdarkstyle = "^3.2.3"
 qtpy = "^2.4.2"
+pyperclip = "^1.9.0"
 
 
 [build-system]
