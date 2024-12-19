@@ -12,14 +12,17 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QGraphicsPixmapItem,
     QGraphicsLineItem,
-    QComboBox,
     QLabel,
     QGraphicsEllipseItem,
+    QHBoxLayout,
+    QLineEdit,
+    QPushButton,
 )
 
 from backend.maps_data import MapsData
 from backend.utils import get_next_fire_time
 from base.settings import config
+from frontend.widgets import NoScrollComboBox
 
 
 class MapWidget(QGraphicsView):
@@ -143,12 +146,20 @@ class MapWidget(QGraphicsView):
         grid_step_y = self.map_pixmap.height() // self.elem_qty_y  # Шаг по оси Y
         return grid_step_x, grid_step_y
 
+    def clear_offset(self):
+        """
+        Очистка смещения, убирание подсветки квадрата
+        """
+        self.dx = 0
+        self.dy = 0
+        self.current_highlight = None
+
     def update_map(self, map_path):
         """
         Обновление карты с очисткой сетки
         """
         self.scene.clear()
-
+        self.clear_offset()
         self.map_pixmap = QPixmap(map_path)
         self.map_item = QGraphicsPixmapItem(self.map_pixmap)
         self.scene.addItem(self.map_item)
@@ -157,15 +168,6 @@ class MapWidget(QGraphicsView):
         self.grid_step_x, self.grid_step_y = self.calculate_grid_step()
 
         self.draw_grid()
-
-
-class NoScrollComboBox(QComboBox):
-    """
-    Виджет комбобокс, без скролла
-    """
-
-    def wheelEvent(self, event):
-        event.ignore()
 
 
 class HMApp(QMainWindow):
@@ -202,17 +204,40 @@ class HMApp(QMainWindow):
         self.main_layout.addWidget(self.map_lz_selector_label)
         self.main_layout.addWidget(self.map_lz_selector_widget)
 
+        coord_input_layout = QHBoxLayout()
+        self.game_x = QLineEdit(self)
+        self.game_x.setPlaceholderText('X')
+        self.game_y = QLineEdit(self)
+        self.game_y.setPlaceholderText('Y')
+
+        self.offset_button = QPushButton('Посчитать смещение', self)
+        self.offset_button.clicked.connect(self.get_offset)
+
+        coord_input_layout.addWidget(self.game_x)
+        coord_input_layout.addWidget(self.game_y)
+        coord_input_layout.addWidget(self.offset_button)
+        self.main_layout.addLayout(coord_input_layout)
+
+        # dx, dy
+        self.dx_label = QLabel('Смещение Х: 0')
+        self.dy_label = QLabel('Смещение Y: 0')
+        self.main_layout.addWidget(self.dx_label)
+        self.main_layout.addWidget(self.dy_label)
+
         self.map_container = QWidget(self)
         self.map_container.setLayout(self.map_layout)
         self.main_layout.addWidget(self.map_container)
 
         self.get_maps()
+        self.on_map_select()
 
     def on_map_select(self):
         """
         Обработчик переключения карты
         """
         map_name = self.map_selector_widget.currentText()
+        self.dx_label.clear()
+        self.dy_label.clear()
         map_path = MapsData.get_map_url(map_name)
         self.map_widget.update_map(map_path)
         self.get_lz_zones()
@@ -237,3 +262,16 @@ class HMApp(QMainWindow):
             self.map_selector_widget.addItems(files_names)
         except FileNotFoundError:
             print(f'Папка {maps_dir} не найдена')
+
+    def get_offset(self):
+        """
+        Расчет смещения dx, dy
+        """
+        map_name = self.map_selector_widget.currentText().lower()
+        zone = self.map_lz_selector_widget.currentText().lower()
+        zone_info = MapsData.get_zone_info(map_name, zone)
+        original_center_x, original_center_y = zone_info.get('coords')
+        self.map_widget.dx = int(self.game_x.text()) - original_center_x
+        self.map_widget.dy = int(self.game_y.text()) - original_center_y
+        self.dx_label.setText(f'Смещение X: {self.map_widget.dx}')
+        self.dy_label.setText(f'Смещение Y: {self.map_widget.dy}')
