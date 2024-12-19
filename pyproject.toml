@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "ss14-ogs-hellmachine"
+version = "0.1.0"
+description = ""
+authors = ["Alexander Scherbakov <webmasterdracarys@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyqt5 = "^5.15.11"
+pyqt5-qt5 = "^5.15.16"
+pyqt5-sip = "^12.16.1"
+pyqt5-stubs = "^5.15.6.0"
+pyqtwebengine = "^5.15.7"
+pyqtwebengine-qt5 = "^5.15.16"
+python-dotenv = "^1.0.1"
+qdarkstyle = "^3.2.3"
+qtpy = "^2.4.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
