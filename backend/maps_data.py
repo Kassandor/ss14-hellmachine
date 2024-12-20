@@ -13,8 +13,8 @@ class MapsData:
             'west': {'coords': (44, 45), 'direction': 'Запад', 'label': 'Терминал вызова шаттла ЗП-2'},
         },
         'lv522': {
-            'east': {'coords': (165, 33), 'direction': 'Восток', 'label': 'Выше носа шаттла, правый фонарь ЗП-1'},
-            'west': {'coords': (23, 53), 'direction': 'Запад', 'label': 'Правый угол взлетки ЗП-2'},
+            'east': {'coords': (165, 33), 'direction': 'Восток', 'label': 'Правый угол взлетки ЗП-2'},
+            'west': {'coords': (23, 53), 'direction': 'Запад', 'label': 'Выше носа шаттла, правый фонарь ЗП-1'},
         },
         'solaris': {
             'north': {'coords': (33, 204), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-1'},
