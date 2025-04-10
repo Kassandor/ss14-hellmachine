@@ -6,5 +6,6 @@ class NoScrollComboBox(QComboBox):
     Виджет комбобокс, без скролла
     """
 
-    def wheelEvent(self, event):
+    @staticmethod
+    def wheelEvent(event) -> None:
         event.ignore()

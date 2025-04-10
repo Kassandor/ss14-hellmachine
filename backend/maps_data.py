@@ -1,3 +1,5 @@
+from typing import KeysView
+
 from base.settings import config
 
 
@@ -11,6 +13,10 @@ class MapsData:
         'lv624': {
             'east': {'coords': (147, 36), 'direction': 'Восток', 'label': 'Середина взлетки у фонаря ЗП-1'},
             'west': {'coords': (44, 45), 'direction': 'Запад', 'label': 'Терминал вызова шаттла ЗП-2'},
+        },
+        'hybrisa': {
+            'north': {'coords': (217, 242), 'direction': 'Север', 'label': 'Правый угол взлетки ЗП-1'},
+            'south': {'coords': (28, 55), 'direction': 'Юг', 'label': 'Правый угол взлетки ЗП-2'},
         },
         'lv522': {
             'east': {'coords': (165, 33), 'direction': 'Восток', 'label': 'Правый угол взлетки ЗП-2'},
@@ -43,22 +49,21 @@ class MapsData:
     }
 
     @classmethod
-    def get_zones_for_map(cls, map_name):
+    def get_zones_for_map(cls, map_name: str) -> KeysView[str]:
         """
         Возвращает доступные зоны посадки на карте
         """
-        res = cls.ZONES_COORDINATES.get(map_name, {}).keys()
         return cls.ZONES_COORDINATES.get(map_name, {}).keys()
 
     @classmethod
-    def get_zone_info(cls, map_name, zone):
+    def get_zone_info(cls, map_name: str, zone: str) -> dict[str, tuple[int, int] | str] | None:
         """
         Возвращает информацию о зоне посадки
         """
         return cls.ZONES_COORDINATES.get(map_name, {}).get(zone)
 
     @staticmethod
-    def get_map_url(name) -> str:
+    def get_map_url(name: str) -> str:
         """
         Возвращает путь до изображения карты
         """

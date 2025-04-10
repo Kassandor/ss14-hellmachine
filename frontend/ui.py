@@ -1,7 +1,6 @@
 import math
 import os
 
-import pyperclip
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QPen
 from PyQt5.QtWidgets import (
@@ -20,7 +19,7 @@ from PyQt5.QtWidgets import (
 )
 
 from backend.maps_data import MapsData
-from backend.utils import get_next_fire_time
+from backend.utils import get_next_fire_time, Clipboard
 from base.settings import config
 from frontend.widgets import NoScrollComboBox
 
@@ -30,8 +29,9 @@ class MapWidget(QGraphicsView):
     Виджет с картой
     """
 
-    def __init__(self, label, map_path):
+    def __init__(self, label: str, map_path: str) -> None:
         super().__init__()
+        self.clipboard = Clipboard()
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
 
@@ -56,7 +56,7 @@ class MapWidget(QGraphicsView):
         # Атрибут для хранения текущей подсветки
         self.current_highlight = None
 
-    def wheelEvent(self, event):
+    def wheelEvent(self, event) -> None:
         """
         Реализация масштабирования при прокрутке колесика мыши
         """
@@ -64,7 +64,7 @@ class MapWidget(QGraphicsView):
         factor = scale_factor if event.angleDelta().y() > 0 else 1 / scale_factor
         self.scale(factor, factor)  # Масштабируем как по оси X, так и по оси Y
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event) -> None:
         """
         Логика нажатия кнопки мыши
         """
@@ -80,7 +80,7 @@ class MapWidget(QGraphicsView):
             self.label.setText(
                 f"Координаты на сетке: X={grid_x}, Y={grid_y}, следующий выстрел в {get_next_fire_time()}"
             )
-            pyperclip.copy(f'{grid_x}, {grid_y}')
+            self.clipboard.copy(f'{grid_x}, {grid_y}')
 
             # Удаляем предыдущую подсветку (если есть)
             if self.current_highlight:
@@ -109,28 +109,28 @@ class MapWidget(QGraphicsView):
         pen = QPen(Qt.red)
         pen.setStyle(Qt.DashLine)
         pen.setWidth(1)
-        self.draw_x(pen)
-        self.draw_y(pen)
+        self.draw_lines(self.prepare_grid_lines(), pen)
 
-    def draw_x(self, pen):
+    def draw_lines(self, lines: list[tuple[int, int, int, int]], pen: QPen) -> None:
         """
-        Отрисовка X-горизонтали
+        Отрисовка линий XY
         """
-        for x in range(0, self.map_pixmap.width(), self.grid_step_x):
-            line_item = QGraphicsLineItem(x, 0, x, self.map_pixmap.height())  # (x1, y1, x2, y2)
+        for x1, y1, x2, y2 in lines:
+            line_item = QGraphicsLineItem(x1, y1, x2, y2)
             line_item.setPen(pen)
             self.scene.addItem(line_item)
 
-    def draw_y(self, pen):
+    def prepare_grid_lines(self) -> list[tuple[int, int, int, int]]:
         """
-        Отрисовка Y-вертикали
+        Подготовка XY-линий
         """
-        for y in range(0, self.map_pixmap.height(), self.grid_step_y):
-            line_item = QGraphicsLineItem(0, y, self.map_pixmap.width(), y)  # (x1, y1, x2, y2)
-            line_item.setPen(pen)
-            self.scene.addItem(line_item)
+        width = self.map_pixmap.width()
+        height = self.map_pixmap.height()
+        x_lines = [(x, 0, x, height) for x in range(0, width, self.grid_step_x)]
+        y_lines = [(0, y, width, y) for y in range(0, height, self.grid_step_y)]
+        return x_lines + y_lines
 
-    def calculate_elem_qty(self):
+    def calculate_elem_qty(self) -> tuple[int, int]:
         """
         Получение количества тайлов по длине и ширине
         """
@@ -138,7 +138,7 @@ class MapWidget(QGraphicsView):
         elem_qty_y = self.map_pixmap.height() // MapsData.STATIC_TILE_SIZE
         return elem_qty_x, elem_qty_y
 
-    def calculate_grid_step(self):
+    def calculate_grid_step(self) -> tuple[int, int]:
         """
         Получение шага координатной сетки
         """
@@ -146,7 +146,7 @@ class MapWidget(QGraphicsView):
         grid_step_y = self.map_pixmap.height() // self.elem_qty_y  # Шаг по оси Y
         return grid_step_x, grid_step_y
 
-    def clear_offset(self):
+    def clear_offset(self) -> None:
         """
         Очистка смещения, убирание подсветки квадрата
         """
@@ -154,7 +154,7 @@ class MapWidget(QGraphicsView):
         self.dy = 0
         self.current_highlight = None
 
-    def update_map(self, map_path):
+    def update_map(self, map_path: str) -> None:
         """
         Обновление карты с очисткой сетки
         """
@@ -231,7 +231,7 @@ class HMApp(QMainWindow):
         self.get_maps()
         self.on_map_select()
 
-    def on_map_select(self):
+    def on_map_select(self) -> None:
         """
         Обработчик переключения карты
         """
@@ -242,7 +242,7 @@ class HMApp(QMainWindow):
         self.map_widget.update_map(map_path)
         self.get_lz_zones()
 
-    def get_lz_zones(self):
+    def get_lz_zones(self) -> None:
         """
         Получение зон посадки на карте
         """
@@ -250,7 +250,7 @@ class HMApp(QMainWindow):
         map_name = self.map_selector_widget.currentText().lower()
         self.map_lz_selector_widget.addItems(MapsData.get_zones_for_map(map_name))
 
-    def get_maps(self):
+    def get_maps(self) -> None:
         """
         Получение всех карт
         """
@@ -263,7 +263,7 @@ class HMApp(QMainWindow):
         except FileNotFoundError:
             print(f'Папка {maps_dir} не найдена')
 
-    def get_offset(self):
+    def get_offset(self) -> None:
         """
         Расчет смещения dx, dy
         """
