@@ -2,8 +2,8 @@
 Система наведения "HM - Hell Machine", предназначена для точного расчета координат на игровой карте с целью нанесения туда ударов орбитальным орудием, либо же минометами.
 
 ## Ссылка на приложение
-1. windows: [https://disk.yandex.ru/d/U2mKYyZTMxAqxg](https://github.com/Kassandor/ss14-hellmachine/releases/download/v1.1.0/hellmachine_win64.exe)
-2. linux: [https://disk.yandex.ru/d/bOUeO3IsT7q1lw](https://github.com/Kassandor/ss14-hellmachine/releases/download/v1.1.0/hellmachine_linux_amd64)
+1. windows: https://github.com/Kassandor/ss14-hellmachine/releases/download/v1.1.0/hellmachine_win64.exe
+2. linux: https://github.com/Kassandor/ss14-hellmachine/releases/download/v1.1.0/hellmachine_linux_amd64
 
 ## Порядок запуска
 1. Скачиваете приложение по одной из ссылок под вашу ОС
