@@ -29,7 +29,7 @@ class MapWidget(QGraphicsView):
     Виджет с картой
     """
 
-    def __init__(self, label: str, map_path: str) -> None:
+    def __init__(self, label: QLabel, map_path: str) -> None:
         super().__init__()
         self.clipboard = Clipboard()
         self.scene = QGraphicsScene(self)
@@ -52,6 +52,8 @@ class MapWidget(QGraphicsView):
 
         self.dx = 0
         self.dy = 0
+        self.grid_x = 0
+        self.grid_y = 0
 
         # Атрибут для хранения текущей подсветки
         self.current_highlight = None
@@ -72,15 +74,15 @@ class MapWidget(QGraphicsView):
             click_pos = self.mapToScene(event.pos())
 
             # Переводим координаты Y так, чтобы Y рос вверх
-            grid_x, grid_y = (
+            self.grid_x, self.grid_y = (
                 math.ceil((click_pos.x() / self.grid_step_x) + self.dx),
                 math.ceil(((self.map_pixmap.height() - click_pos.y()) / self.grid_step_y) + self.dy),
             )
             # Обновляем текст в QLabel
             self.label.setText(
-                f"Координаты на сетке: X={grid_x}, Y={grid_y}, следующий выстрел в {get_next_fire_time()}"
+                f"Координаты на сетке: X={self.grid_x}, Y={self.grid_y}, следующий выстрел в {get_next_fire_time()}"
             )
-            self.clipboard.copy(f'{grid_x}, {grid_y}')
+            self.clipboard.copy(f'{self.grid_x}, {self.grid_y}')
 
             # Удаляем предыдущую подсветку (если есть)
             if self.current_highlight:
@@ -196,13 +198,8 @@ class HMApp(QMainWindow):
         self.map_selector_widget = NoScrollComboBox(self)
         self.map_selector_widget.currentIndexChanged.connect(self.on_map_select)
 
-        self.map_lz_selector_label = QLabel('Зона посадки', self)
-        self.map_lz_selector_widget = NoScrollComboBox(self)
-
         self.map_layout.addWidget(self.map_selector_label)
         self.map_layout.addWidget(self.map_selector_widget)
-        self.main_layout.addWidget(self.map_lz_selector_label)
-        self.main_layout.addWidget(self.map_lz_selector_widget)
 
         coord_input_layout = QHBoxLayout()
         self.game_x = QLineEdit(self)
@@ -240,15 +237,6 @@ class HMApp(QMainWindow):
         self.dy_label.clear()
         map_path = MapsData.get_map_url(map_name)
         self.map_widget.update_map(map_path)
-        self.get_lz_zones()
-
-    def get_lz_zones(self) -> None:
-        """
-        Получение зон посадки на карте
-        """
-        self.map_lz_selector_widget.clear()
-        map_name = self.map_selector_widget.currentText().lower()
-        self.map_lz_selector_widget.addItems(MapsData.get_zones_for_map(map_name))
 
     def get_maps(self) -> None:
         """
@@ -267,11 +255,11 @@ class HMApp(QMainWindow):
         """
         Расчет смещения dx, dy
         """
-        map_name = self.map_selector_widget.currentText().lower()
-        zone = self.map_lz_selector_widget.currentText().lower()
-        zone_info = MapsData.get_zone_info(map_name, zone)
-        original_center_x, original_center_y = zone_info.get('coords')
-        self.map_widget.dx = int(self.game_x.text()) - original_center_x
-        self.map_widget.dy = int(self.game_y.text()) - original_center_y
+
+        # todo: Допилить, вынести x,y в переменные класса map_widget
+        print(self.map_widget.grid_x)
+        print(self.map_widget.grid_y)
+        self.map_widget.dx = int(self.game_x.text()) - self.map_widget.grid_x
+        self.map_widget.dy = int(self.game_y.text()) - self.map_widget.grid_y
         self.dx_label.setText(f'Смещение X: {self.map_widget.dx}')
         self.dy_label.setText(f'Смещение Y: {self.map_widget.dy}')

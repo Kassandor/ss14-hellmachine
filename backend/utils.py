@@ -8,6 +8,7 @@ class Clipboard:
     """
     Буфер обмена под windows, linux
     """
+
     def __init__(self):
         self.platform = platform.system()
         self.set_clipboard()
