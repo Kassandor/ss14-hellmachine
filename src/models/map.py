@@ -1,4 +1,4 @@
-from base.settings import config
+from src.base.settings import config
 
 
 class MapsData:
